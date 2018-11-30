@@ -48,18 +48,21 @@ namespace CoreTranslator.Services
                     var textPart = document[i];
                     if (textPart.StringType == StringType.Text && textPart.Content.Trim() != string.Empty && !textPart.Content.Contains('@'))
                     {
-                        xmlResources.Add(new TranslatePair
+                        if(!xmlResources.Any(t=>t.SourceString.Trim() == textPart.Content.Trim()))
                         {
-                            SourceString = textPart.Content,
-                            TargetString = _bingtranslator.CallTranslate(textPart.Content, "zh")
-                        });
+                            xmlResources.Add(new TranslatePair
+                            {
+                                SourceString = textPart.Content,
+                                TargetString = _bingtranslator.CallTranslate(textPart.Content, "zh")
+                            });
+                        }
                         textPart.Content = Translate(textPart.Content);
                     }
-                    else if (textPart.StringType == StringType.Tag && textPart.Content.ToLower().StartsWith("<script"))
+                    else if (textPart.StringType == StringType.Tag && textPart.Content.ToLower().Trim().StartsWith("<script"))
                     {
                         document[i + 1].StringType = StringType.Tag;
                     }
-                    else if (textPart.StringType == StringType.Tag && textPart.Content.ToLower().StartsWith("<link"))
+                    else if (textPart.StringType == StringType.Tag && textPart.Content.ToLower().Trim().StartsWith("<link"))
                     {
                         document[i + 1].StringType = StringType.Tag;
                     }

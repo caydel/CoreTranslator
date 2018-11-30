@@ -15,10 +15,11 @@ namespace CoreTranslator.Services
         public List<HTMLPart> AnalyseFile(string html)
         {
             var document = new List<HTMLPart>();
-            while (html.Length > 0)
+            while (html.Trim().Length > 0)
             {
                 var (newpart, remainingHtml) = GetNextPart(html);
-                html = remainingHtml.Trim();
+                html = remainingHtml;
+                newpart.Content = newpart.Content.Replace('\\', '/');
                 document.Add(newpart);
             }
             return document;
@@ -27,17 +28,17 @@ namespace CoreTranslator.Services
         public (HTMLPart, string) GetNextPart(string html)
         {
             var part = new HTMLPart();
-            if (html.Length < 1)
+            if (html.Trim().Length < 1)
             {
                 throw new Exception();
             }
-            if (html[0] == '<')
+            if (html.Trim()[0] == '<')
             {
                 part.StringType = StringType.Tag;
                 part.Content = html.Substring(0, html.IndexOf('>') + 1);
                 return (part, html.Substring(html.IndexOf('>') + 1));
             }
-            else if (html[0] == '@' || html[0] == '}')
+            else if (html.Trim()[0] == '@' || html.Trim()[0] == '}')
             {
                 part.StringType = StringType.Razor;
                 var endPoint = html.IndexOf('<');
