@@ -12,16 +12,16 @@ namespace CoreTranslator.Services
     public class TranslatorCore
     {
         private readonly BingTranslator _bingtranslator;
-        private readonly FileRenderer _fileRenderer;
+        private readonly DocumentAnalyser _documentAnalyser;
         private readonly ILogger<TranslatorCore> _logger;
 
         public TranslatorCore(
             BingTranslator bingTranslator,
-            FileRenderer fileRenderer,
+            DocumentAnalyser documentAnalyser,
             ILoggerFactory loggerFactory)
         {
             _bingtranslator = bingTranslator;
-            _fileRenderer = fileRenderer;
+            _documentAnalyser = documentAnalyser;
             _logger = loggerFactory.CreateLogger<TranslatorCore>();
         }
 
@@ -40,7 +40,7 @@ namespace CoreTranslator.Services
                 }
 
                 var file = File.ReadAllText(cshtml);
-                var document = _fileRenderer.RenderFile(file);
+                var document = _documentAnalyser.AnalyseFile(file);
                 var xmlResources = new List<TranslatePair>();
                 _logger.LogInformation($"Translating: {cshtml}");
                 for (int i = 0; i < document.Count; i++)
@@ -78,8 +78,6 @@ namespace CoreTranslator.Services
             }
         }
 
-
-
         public string RenderCSHtml(List<HTMLPart> parts)
         {
             string cshtml = "";
@@ -95,10 +93,14 @@ namespace CoreTranslator.Services
 
         public string Translate(string input)
         {
-            return $"@Localizer[\"{input.Trim()}\"]";
+            var toTranslate = input.Trim();
+            if (toTranslate.Length == 0)
+            {
+                return "";
+            }
+            var translated = $"@Localizer[\"{toTranslate}\"]";
+            return input.Replace(toTranslate, translated);
         }
-
-
 
         public string GenerateXML(List<TranslatePair> sourceDocument)
         {

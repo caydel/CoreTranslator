@@ -5,14 +5,14 @@ using System.Text;
 
 namespace CoreTranslator.Services
 {
-    public class FileRenderer
+    public class DocumentAnalyser
     {
-        public FileRenderer()
+        public DocumentAnalyser()
         {
 
         }
 
-        public List<HTMLPart> RenderFile(string html)
+        public List<HTMLPart> AnalyseFile(string html)
         {
             var document = new List<HTMLPart>();
             while (html.Trim().Length > 0)
@@ -68,6 +68,5 @@ namespace CoreTranslator.Services
                 }
             }
         }
-
     }
 }
