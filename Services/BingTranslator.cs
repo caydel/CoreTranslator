@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 using CoreTranslator.Services.BingModels;
-using Aiursoft.Pylon.Models;
 
 namespace CoreTranslator.Services
 {
