@@ -15,7 +15,7 @@ namespace CoreTranslator
             var apiAddress = $"https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to={targetLanguage}";
             var client = new RestClient(apiAddress);
             var request = new RestRequest(Method.POST);
-            request.AddHeader("Ocp-Apim-Subscription-Key", "15b6c68fc6ea42b3956d2527bbf61f9b");
+            request.AddHeader("Ocp-Apim-Subscription-Key", "");
             request.AddHeader("Content-Type", "application/json");
             var inputSource = new List<Translation>
             {
