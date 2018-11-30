@@ -14,19 +14,6 @@ namespace CoreTranslator
         Razor,
         Text
     }
-    public class StringPart
-    {
-        public StringType StringType { get; set; }
-        public string Content { get; set; }
-        public override string ToString() => this.Content;
-    }
-
-    public class TranslatePair
-    {
-        public string SourceString { get; set; }
-        public string TargetString { get; set; }
-    }
-
 
     public class Program
     {
@@ -35,6 +22,8 @@ namespace CoreTranslator
             BuildApplication()
                 .GetService<TranslatorCore>()
                 .DoWork();
+
+            Console.ReadLine();
         }
 
         static ServiceProvider BuildApplication()
@@ -43,9 +32,12 @@ namespace CoreTranslator
             var services = new ServiceCollection();
 
             startUp.ConfigureServices(services);
-            var serviceProvider = services.BuildServiceProvider();
-            startUp.Configure(serviceProvider.GetService<ILoggerFactory>(), serviceProvider.GetService<BingTranslator>());
 
+            var serviceProvider = services.BuildServiceProvider();
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var bingTranslator = serviceProvider.GetService<BingTranslator>();
+
+            startUp.Configure(loggerFactory, bingTranslator);
             return serviceProvider;
         }
     }

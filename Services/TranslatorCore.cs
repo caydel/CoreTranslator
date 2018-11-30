@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CoreTranslator.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,13 +70,12 @@ namespace CoreTranslator.Services
                 File.WriteAllText(xmlPosition, translatedResources);
                 File.WriteAllText(cshtml.Replace(".cshtml", ".cshtml"), translated);
                 _logger.LogInformation($"Writting: {xmlPosition}");
-                Thread.Sleep(10000);
             }
         }
 
-        public List<StringPart> RenderFile(string html)
+        public List<HTMLPart> RenderFile(string html)
         {
-            var document = new List<StringPart>();
+            var document = new List<HTMLPart>();
             while (html.Trim().Length > 0)
             {
                 var (newpart, remainingHtml) = GetNextPart(html);
@@ -85,7 +85,7 @@ namespace CoreTranslator.Services
             return document;
         }
 
-        public string RenderCSHtml(List<StringPart> parts)
+        public string RenderCSHtml(List<HTMLPart> parts)
         {
             string cshtml = "";
             foreach (var part in parts)
@@ -103,9 +103,9 @@ namespace CoreTranslator.Services
             return $"@Localizer[\"{input.Trim()}\"]";
         }
 
-        public (StringPart, string) GetNextPart(string html)
+        public (HTMLPart, string) GetNextPart(string html)
         {
-            var part = new StringPart();
+            var part = new HTMLPart();
             if (html.Trim().Length < 1)
             {
                 throw new Exception();
