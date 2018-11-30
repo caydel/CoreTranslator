@@ -44,7 +44,7 @@ namespace CoreTranslator
 
             startUp.ConfigureServices(services);
             var serviceProvider = services.BuildServiceProvider();
-            startUp.Configure(serviceProvider.GetService<ILoggerFactory>());
+            startUp.Configure(serviceProvider.GetService<ILoggerFactory>(), serviceProvider.GetService<BingTranslator>());
 
             return serviceProvider;
         }

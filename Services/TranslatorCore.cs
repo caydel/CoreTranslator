@@ -68,7 +68,7 @@ namespace CoreTranslator.Services
                 var toWrite = Directory.CreateDirectory(new FileInfo(xmlPosition).Directory.FullName);
                 File.WriteAllText(xmlPosition, translatedResources);
                 File.WriteAllText(cshtml.Replace(".cshtml", ".cshtml"), translated);
-                Console.WriteLine($"Writting: {xmlPosition}");
+                _logger.LogInformation($"Writting: {xmlPosition}");
                 Thread.Sleep(10000);
             }
         }

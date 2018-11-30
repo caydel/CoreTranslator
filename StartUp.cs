@@ -21,11 +21,17 @@ namespace CoreTranslator
             services.AddScoped<TranslatorCore>();
         }
 
-        public void Configure(ILoggerFactory loggerFactory)
+        public void Configure(ILoggerFactory loggerFactory, BingTranslator translator)
         {
             loggerFactory
                 .AddConsole(LogLevel.Debug)
                 .AddDebug();
+
+
+            Console.WriteLine("Enter your bing API key:");
+            var key = Console.ReadLine().Trim();
+            translator
+                .Init(key);
         }
     }
 }

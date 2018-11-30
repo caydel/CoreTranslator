@@ -6,16 +6,23 @@ using Newtonsoft.Json;
 using CoreTranslator.Services.BingModels;
 using Aiursoft.Pylon.Models;
 
-namespace CoreTranslator
+namespace CoreTranslator.Services
 {
     public class BingTranslator
     {
+        private string _apiKey;
+
+        public void Init(string apiKey)
+        {
+            _apiKey = apiKey;
+        }
+
         public string CallTranslate(string input, string targetLanguage)
         {
             var apiAddress = $"https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to={targetLanguage}";
             var client = new RestClient(apiAddress);
             var request = new RestRequest(Method.POST);
-            request.AddHeader("Ocp-Apim-Subscription-Key", "");
+            request.AddHeader("Ocp-Apim-Subscription-Key", _apiKey);
             request.AddHeader("Content-Type", "application/json");
             var inputSource = new List<Translation>
             {
