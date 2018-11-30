@@ -12,13 +12,16 @@ namespace CoreTranslator.Services
     public class TranslatorCore
     {
         private readonly BingTranslator _bingtranslator;
+        private readonly FileRenderer _fileRenderer;
         private readonly ILogger<TranslatorCore> _logger;
 
         public TranslatorCore(
             BingTranslator bingTranslator,
+            FileRenderer fileRenderer,
             ILoggerFactory loggerFactory)
         {
             _bingtranslator = bingTranslator;
+            _fileRenderer = fileRenderer;
             _logger = loggerFactory.CreateLogger<TranslatorCore>();
         }
 
@@ -27,7 +30,7 @@ namespace CoreTranslator.Services
             _logger.LogInformation("Starting application...");
             var currentDirectory = Directory.GetCurrentDirectory();
             string[] cshtmls = Directory.GetFileSystemEntries(currentDirectory, "*.cshtml", SearchOption.AllDirectories);
-            foreach (var cshtml in cshtmls.Where(t => !t.EndsWith("td.cshtml")))
+            foreach (var cshtml in cshtmls)
             {
                 _logger.LogInformation($"Analysing: {cshtml}");
                 var fileName = Path.GetFileName(cshtml);
@@ -35,8 +38,9 @@ namespace CoreTranslator.Services
                 {
                     continue;
                 }
+
                 var file = File.ReadAllText(cshtml);
-                var document = RenderFile(file);
+                var document = _fileRenderer.RenderFile(file);
                 var xmlResources = new List<TranslatePair>();
                 _logger.LogInformation($"Translating: {cshtml}");
                 for (int i = 0; i < document.Count; i++)
@@ -67,23 +71,14 @@ namespace CoreTranslator.Services
 
                 var xmlPosition = cshtml.Replace("\\Views\\", "\\Resources\\Views\\").Replace(".cshtml", ".zh.resx");
                 var toWrite = Directory.CreateDirectory(new FileInfo(xmlPosition).Directory.FullName);
+
+                _logger.LogInformation($"Writting: {xmlPosition}");
                 File.WriteAllText(xmlPosition, translatedResources);
                 File.WriteAllText(cshtml.Replace(".cshtml", ".cshtml"), translated);
-                _logger.LogInformation($"Writting: {xmlPosition}");
             }
         }
 
-        public List<HTMLPart> RenderFile(string html)
-        {
-            var document = new List<HTMLPart>();
-            while (html.Trim().Length > 0)
-            {
-                var (newpart, remainingHtml) = GetNextPart(html);
-                html = remainingHtml;
-                document.Add(newpart);
-            }
-            return document;
-        }
+
 
         public string RenderCSHtml(List<HTMLPart> parts)
         {
@@ -103,50 +98,6 @@ namespace CoreTranslator.Services
             return $"@Localizer[\"{input.Trim()}\"]";
         }
 
-        public (HTMLPart, string) GetNextPart(string html)
-        {
-            var part = new HTMLPart();
-            if (html.Trim().Length < 1)
-            {
-                throw new Exception();
-            }
-            if (html[0] == '<')
-            {
-                part.StringType = StringType.Tag;
-                part.Content = html.Substring(0, html.IndexOf('>') + 1);
-                return (part, html.Substring(html.IndexOf('>') + 1));
-            }
-            else if (html.Trim()[0] == '@' || html.Trim()[0] == '}')
-            {
-                part.StringType = StringType.Razor;
-                var endPoint = html.IndexOf('<');
-                if (endPoint > 0)
-                {
-                    part.Content = html.Substring(0, endPoint);
-                    return (part, html.Substring(endPoint));
-                }
-                else
-                {
-                    part.Content = html;
-                    return (part, "");
-                }
-            }
-            else
-            {
-                part.StringType = StringType.Text;
-                var endPoint = html.IndexOf('<');
-                if (endPoint > 0)
-                {
-                    part.Content = html.Substring(0, endPoint);
-                    return (part, html.Substring(endPoint));
-                }
-                else
-                {
-                    part.Content = html;
-                    return (part, "");
-                }
-            }
-        }
 
 
         public string GenerateXML(List<TranslatePair> sourceDocument)

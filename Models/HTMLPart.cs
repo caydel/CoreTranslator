@@ -4,6 +4,12 @@ using System.Text;
 
 namespace CoreTranslator.Models
 {
+    public enum StringType
+    {
+        Tag,
+        Razor,
+        Text
+    }
     public class HTMLPart
     {
         public StringType StringType { get; set; }

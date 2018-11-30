@@ -8,13 +8,6 @@ using System.Linq;
 
 namespace CoreTranslator
 {
-    public enum StringType
-    {
-        Tag,
-        Razor,
-        Text
-    }
-
     public class Program
     {
         static void Main(string[] args)
@@ -22,8 +15,6 @@ namespace CoreTranslator
             BuildApplication()
                 .GetService<TranslatorCore>()
                 .DoWork();
-
-            Console.ReadLine();
         }
 
         static ServiceProvider BuildApplication()
