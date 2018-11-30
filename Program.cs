@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,9 +28,15 @@ namespace CoreTranslator
         public string SourceString { get; set; }
         public string TargetString { get; set; }
     }
-    class Program
+
+    public class CoreTranslator
     {
-        static void Main(string[] args)
+        private readonly BingTranslator _bingtranslator;
+        public CoreTranslator(BingTranslator bingTranslator)
+        {
+            _bingtranslator = bingTranslator;
+        }
+        public void DoWork()
         {
             var currentDirectory = Directory.GetCurrentDirectory();
             string[] cshtmls = Directory.GetFileSystemEntries(currentDirectory, "*.cshtml", SearchOption.AllDirectories);
@@ -52,7 +60,7 @@ namespace CoreTranslator
                         xmlResources.Add(new TranslatePair
                         {
                             SourceString = textPart.Content,
-                            TargetString = BingTranslate(textPart.Content)
+                            TargetString = _bingtranslator.CallTranslate(textPart.Content, "zh")
                         });
                         textPart.Content = Translate(textPart.Content);
                     }
@@ -77,8 +85,7 @@ namespace CoreTranslator
                 Console.WriteLine($"Writting: {xmlPosition}");
             }
         }
-
-        static List<StringPart> RenderFile(string html)
+        public List<StringPart> RenderFile(string html)
         {
             var document = new List<StringPart>();
             while (html.Trim().Length > 0)
@@ -90,7 +97,7 @@ namespace CoreTranslator
             return document;
         }
 
-        static string RenderCSHtml(List<StringPart> parts)
+        public string RenderCSHtml(List<StringPart> parts)
         {
             string cshtml = "";
             foreach (var part in parts)
@@ -103,12 +110,12 @@ namespace CoreTranslator
             return cshtml;
         }
 
-        static string Translate(string input)
+        public string Translate(string input)
         {
             return $"@Localizer[\"{input.Trim()}\"]";
         }
 
-        static (StringPart, string) GetNextPart(string html)
+        public (StringPart, string) GetNextPart(string html)
         {
             var part = new StringPart();
             if (html.Trim().Length < 1)
@@ -153,12 +160,12 @@ namespace CoreTranslator
             }
         }
 
-        static string BingTranslate(string input)
-        {
-            return BingTranslator.CallTranslate(input, "zh");
-        }
+        //public string BingTranslate(string input)
+        //{
+        //    return BingTranslator.CallTranslate(input, "zh");
+        //}
 
-        static string GenerateXML(List<TranslatePair> sourceDocument)
+        public string GenerateXML(List<TranslatePair> sourceDocument)
         {
             var programPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             var generatedItems = string.Empty;
@@ -169,6 +176,33 @@ namespace CoreTranslator
             var template = File.ReadAllText(programPath + "\\Template.xml");
             var translated = template.Replace("{{Content}}", generatedItems);
             return translated;
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //setup our DI
+            var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<BingTranslator>()
+                .AddScoped<CoreTranslator>()
+                .BuildServiceProvider();
+
+            //configure console logging
+            serviceProvider
+                .GetService<ILoggerFactory>()
+                .AddConsole(LogLevel.Debug);
+
+            var logger = serviceProvider.GetService<ILoggerFactory>()
+                .CreateLogger<Program>();
+            logger.LogDebug("Starting application");
+
+            //do the actual work here
+            var translator = serviceProvider.GetService<CoreTranslator>();
+            translator.DoWork();
+
+            logger.LogDebug("All done!");
         }
     }
 }

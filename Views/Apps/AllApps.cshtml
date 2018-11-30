@@ -5,9 +5,9 @@
 <div class="container-fluid">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a asp-controller="Apps" asp-action="Index">@Localizer["Dashboard"]</a>
+            <a asp-controller="Apps" asp-action="Index">Dashboard</a>
         </li>
-        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        <li class="breadcrumb-item active">Title</li>
     </ol>
     <div class="row">
         @foreach (var app in Model.AllApps)
@@ -40,7 +40,7 @@
                         <div class="mr-5 small">@Html.DisplayFor(t => app.AppDescription)</div>
                     </div>
                     <a class="card-footer text-white clearfix small z-1" asp-controller="Apps" asp-action="ViewApp" asp-route-id="@app.AppId">
-                        <span class="float-left">@Localizer["Edit Settings"]</span>
+                        <span class="float-left">Edit Settings</span>
                         <span class="float-right">
                             <i class="fa fa-angle-right"></i>
                         </span>
