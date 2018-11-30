@@ -1,76 +1,37 @@
-﻿#pragma warning disable IDE1006 // Naming Styles
-using RestSharp;
+﻿using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
+using CoreTranslator.Services.BingModels;
+using Aiursoft.Pylon.Models;
 
 namespace CoreTranslator
 {
-    public class DetectedLanguage
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public string language { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public double score { get; set; }
-    }
-
-    public class TranslationsItem
-    {
-        /// <summary>
-        /// 我可以。
-        /// </summary>
-        public string text { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public string to { get; set; }
-    }
-
-    public class W
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public DetectedLanguage detectedLanguage { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<TranslationsItem> translations { get; set; }
-    }
-
-    public class Translation
-    {
-        public string Text { get; set; }
-    }
-#pragma warning restore IDE1006 // Naming Styles
-
     public class BingTranslator
     {
-        public static string CallTranslate(string input)
+        public static string CallTranslate(string input, string targetLanguage)
         {
-            Console.WriteLine($"\t\tCalling Bing: {input}");
-            var client = new RestClient("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=zh");
+
+            var apiAddress = $"https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to={targetLanguage}";
+            var client = new RestClient(apiAddress);
             var request = new RestRequest(Method.POST);
-            request.AddHeader("cache-control", "no-cache");
             request.AddHeader("Ocp-Apim-Subscription-Key", "key");
             request.AddHeader("Content-Type", "application/json");
-
-            var inputSource = new List<Translation>();
-            inputSource.Add(new Translation
+            var inputSource = new List<Translation>
             {
-                Text = input
-            });
+                new Translation
+                {
+                    Text = input
+                }
+            };
             var inputJson = JsonConvert.SerializeObject(inputSource);
             request.AddParameter("undefined", inputJson, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
             var json = response.Content;
-            var result = JsonConvert.DeserializeObject<List<W>>(json);
-            return result[0].translations[0].text;
+            var result = JsonConvert.DeserializeObject<List<BingResponse>>(json);
+            Console.WriteLine($"\t\tCalled Bing: {input} - {result[0].Translations[0].Text}");
+            return result[0].Translations[0].Text;
         }
     }
 }
