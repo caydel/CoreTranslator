@@ -155,7 +155,7 @@ namespace CoreTranslator
 
         static string BingTranslate(string input)
         {
-            return BingTranslator.CallTranslate(input);
+            return BingTranslator.CallTranslate(input, "zh");
         }
 
         static string GenerateXML(List<TranslatePair> sourceDocument)
