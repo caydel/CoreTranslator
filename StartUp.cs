@@ -25,8 +25,7 @@ namespace CoreTranslator
         public void Configure(ILoggerFactory loggerFactory, BingTranslator translator)
         {
             loggerFactory
-                .AddConsole(LogLevel.Debug)
-                .AddDebug();
+                .AddConsole(LogLevel.Debug);
 
 
             Console.WriteLine("Enter your bing API key:");
