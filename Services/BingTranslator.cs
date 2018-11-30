@@ -4,12 +4,20 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 using CoreTranslator.Services.BingModels;
+using Microsoft.Extensions.Logging;
 
 namespace CoreTranslator.Services
 {
     public class BingTranslator
     {
-        private string _apiKey;
+        private readonly ILogger<BingTranslator> _logger;
+        private static string _apiKey;
+
+        public BingTranslator(
+            ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<BingTranslator>();
+        }
 
         public void Init(string apiKey)
         {
@@ -35,7 +43,7 @@ namespace CoreTranslator.Services
             IRestResponse response = client.Execute(request);
             var json = response.Content;
             var result = JsonConvert.DeserializeObject<List<BingResponse>>(json);
-            Console.WriteLine($"\t\tCalled Bing: {input} - {result[0].Translations[0].Text}");
+            _logger.LogInformation($"\t\tCalled Bing: {input} - {result[0].Translations[0].Text}");
             return result[0].Translations[0].Text;
         }
     }

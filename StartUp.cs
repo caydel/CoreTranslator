@@ -17,7 +17,7 @@ namespace CoreTranslator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging();
-            services.AddSingleton<BingTranslator>();
+            services.AddScoped<BingTranslator>();
             services.AddScoped<FileRenderer>();
             services.AddScoped<TranslatorCore>();
         }
