@@ -13,14 +13,6 @@ This app helps you generate translated `.cshtml` files and `resources` files.
 
 * Follow the document here [ASP.NET Core Localization](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-2.1)
 
-Use the following code to inject localizer:
-
-```cshtml
-@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-```
-
 Use the following code to register the localizer service:
 
 ```csharp
@@ -48,9 +40,23 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 });
 ```
 
+Use the following code to inject localizer:
+
+```cshtml
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+```
+
+Now run this app!
+
 ## How to use
 
 * Install [.NET Core SDK](http://dot.net)
 * Compile the project using command `dotnet publich -c Release -r win-x64`
 * Run the published `exe` in your ASP.NET Core app root folder
 * Input your bing translate API key. Get it [here](https://portal.azure.com)
+
+## Caution
+
+Running this under your project folder may ruin your project! It will override any existing resource files and change your `cshtml`! Do run `git commit` under your project before running this app.
