@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace CoreTranslator.Services
@@ -48,7 +49,7 @@ namespace CoreTranslator.Services
                     var textPart = document[i];
                     if (textPart.StringType == StringType.Text && textPart.Content.Trim() != string.Empty && !textPart.Content.Contains('@'))
                     {
-                        if(!xmlResources.Any(t=>t.SourceString.Trim() == textPart.Content.Trim()))
+                        if (!xmlResources.Any(t => t.SourceString.Trim() == textPart.Content.Trim()))
                         {
                             xmlResources.Add(new TranslatePair
                             {
@@ -79,6 +80,48 @@ namespace CoreTranslator.Services
                 File.WriteAllText(xmlPosition, translatedResources);
                 File.WriteAllText(cshtml.Replace(".cshtml", ".cshtml"), translated);
             }
+
+            var modelsPath = Path.Combine(currentDirectory, "Models");
+            if (Directory.Exists(modelsPath))
+            {
+                string[] csfiles = Directory.GetFileSystemEntries(modelsPath, "*.cs", SearchOption.AllDirectories);
+                foreach (var csfile in csfiles)
+                {
+                    var fileContent = File.ReadAllText(csfile);
+                    var allstrings = GetAllStringsInCS(fileContent);
+                    var xmlResources = new List<TranslatePair>();
+                    foreach (var stringInCs in allstrings)
+                    {
+                        xmlResources.Add(new TranslatePair
+                        {
+                            SourceString = stringInCs,
+                            TargetString = _bingtranslator.CallTranslate(stringInCs, "zh")
+                        });
+                    }
+                    var translatedResources = GenerateXML(xmlResources);
+                    var xmlPosition = csfile.Replace("\\Models\\", "\\Resources\\Models\\").Replace(".cs", ".zh.resx");
+                    var toWrite = Directory.CreateDirectory(new FileInfo(xmlPosition).Directory.FullName);
+                    _logger.LogInformation($"Writting: {xmlPosition}");
+                    File.WriteAllText(xmlPosition, translatedResources);
+                }
+            }
+        }
+
+        public List<string> GetAllStringsInCS(string fileContent)
+        {
+            List<string> s = new List<string>();
+            if (fileContent.Where(t => t == '"').Count() < 2)
+            {
+                return s;
+            }
+            while (fileContent.Where(t => t == '"').Count() >= 2)
+            {
+                fileContent = fileContent.Substring(fileContent.IndexOf('"') + 1);
+                string newString = fileContent.Substring(0, fileContent.IndexOf('"'));
+                fileContent = fileContent.Substring(fileContent.IndexOf('"') + 1);
+                s.Add(newString);
+            }
+            return s;
         }
 
         public string RenderCSHtml(List<HTMLPart> parts)
