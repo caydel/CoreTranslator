@@ -7,7 +7,7 @@ This app helps you generate translated `.cshtml` files and `resources` files.
 * Find all files ends with `.cshtml`
 * foreach `cshtml` file, replace all text in tag sround with `@Localizer[""]`
 * Call bing translate API to translate all those content
-* Save the translated file as `Resource` file.
+* Save the translated file as `Resource` file in the `Resources` folder.
 
 ## Before running the translator
 
@@ -20,7 +20,8 @@ Use the following code to register the localizer service:
 services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 services.AddMvc()
-    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
+    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization();
 ```
 
 Use the following code to add localizer middleware:
@@ -55,7 +56,10 @@ Now run this app!
 * Install [.NET Core SDK](http://dot.net)
 * Compile the project using command `dotnet publich -c Release -r win-x64`
 * Run the published `exe` in your ASP.NET Core app root folder
+    - Under your app root folder, there shall be `Views` folder and `Models` folder.
 * Input your bing translate API key. Get it [here](https://portal.azure.com)
+
+The Core Translator won't override any existing translation nor resources files. If your content was already surrounded with `@Localizer[""]`, we won't touch it.
 
 ## Caution
 
