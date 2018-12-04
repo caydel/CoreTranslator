@@ -63,4 +63,4 @@ Now run this app!
 
 ## Caution
 
-Running this under your project folder may ruin your project! It will override any existing resource files and change your `cshtml`! Do run `git commit` under your project before running this app.
+Running this under your project folder may ruin your project! It may change your `cshtml`! Do run `git commit` under your project before running this app.
