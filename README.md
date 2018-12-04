@@ -9,6 +9,8 @@ This app helps you generate translated `.cshtml` files and `resources` files.
 * Call bing translate API to translate all those content
 * Save the translated file as `Resource` file in the `Resources` folder.
 
+The Core Translator won't override any existing translation nor resources files. If your content was already surrounded with `@Localizer[""]`, we won't touch it.
+
 ## Before running the translator
 
 * Follow the document here [ASP.NET Core Localization](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-2.1)
@@ -58,8 +60,6 @@ Now run this app!
 * Run the published `exe` in your ASP.NET Core app root folder
     - Under your app root folder, there shall be `Views` folder and `Models` folder.
 * Input your bing translate API key. Get it [here](https://portal.azure.com)
-
-The Core Translator won't override any existing translation nor resources files. If your content was already surrounded with `@Localizer[""]`, we won't touch it.
 
 ## Caution
 
