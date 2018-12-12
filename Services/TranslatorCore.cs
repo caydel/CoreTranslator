@@ -75,9 +75,11 @@ namespace CoreTranslator.Services
 
                 var xmlPosition = cshtml.Replace("\\Views\\", "\\Resources\\Views\\").Replace(".cshtml", ".zh.resx");
                 var toWrite = Directory.CreateDirectory(new FileInfo(xmlPosition).Directory.FullName);
-
-                _logger.LogInformation($"Writting: {xmlPosition}");
-                File.WriteAllText(xmlPosition, translatedResources);
+                if (!File.Exists(xmlPosition))
+                {
+                    _logger.LogInformation($"Writting: {xmlPosition}");
+                    File.WriteAllText(xmlPosition, translatedResources);
+                }
                 File.WriteAllText(cshtml.Replace(".cshtml", ".cshtml"), translated);
             }
 
