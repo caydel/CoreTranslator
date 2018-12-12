@@ -94,11 +94,14 @@ namespace CoreTranslator.Services
                     var xmlResources = new List<TranslatePair>();
                     foreach (var stringInCs in allstrings)
                     {
-                        xmlResources.Add(new TranslatePair
+                        if (!xmlResources.Any(t => t.SourceString.Trim() == stringInCs.Trim()))
                         {
-                            SourceString = stringInCs,
-                            TargetString = _bingtranslator.CallTranslate(stringInCs, "zh")
-                        });
+                            xmlResources.Add(new TranslatePair
+                            {
+                                SourceString = stringInCs,
+                                TargetString = _bingtranslator.CallTranslate(stringInCs, "zh")
+                            });
+                        }
                     }
                     var translatedResources = GenerateXML(xmlResources);
                     var xmlPosition = csfile.Replace("\\Models\\", "\\Resources\\Models\\").Replace(".cs", ".zh.resx");
